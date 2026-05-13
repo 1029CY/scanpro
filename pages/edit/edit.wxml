@@ -4,7 +4,7 @@
                src="{{currentImage}}"
                src="{{currentImage}}"
                bind:change="onCropChange" />
-    <image wx:else class="preview-image"
+    <image wx:else class="preview-image filter-{{filterType}}"
            src="{{currentImage}}"
            mode="widthFix" />
   </view>

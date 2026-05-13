@@ -17,6 +17,23 @@
   width: 100%;
 }
 
+/* CSS 滤镜效果 */
+.filter-original {
+  filter: none;
+}
+
+.filter-enhanced {
+  filter: contrast(1.3) brightness(1.05) saturate(1.1);
+}
+
+.filter-bw {
+  filter: grayscale(1) contrast(2.5) brightness(1.15);
+}
+
+.filter-grayscale {
+  filter: grayscale(1);
+}
+
 .toolbar {
   display: flex;
   justify-content: center;
