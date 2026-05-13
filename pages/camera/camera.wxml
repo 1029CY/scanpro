@@ -1,34 +1,31 @@
 <view class="page">
   <camera class="camera" device-position="back" flash="auto" />
 
-  <view class="viewfinder">
-    <view class="viewfinder-mask top" />
-    <view class="viewfinder-middle">
-      <view class="viewfinder-mask left" />
-      <view class="viewfinder-frame">
-        <view class="corner tl" />
-        <view class="corner tr" />
-        <view class="corner bl" />
-        <view class="corner br" />
-      </view>
-      <view class="viewfinder-mask right" />
+  <!-- 轻量取景辅助线：四个角标 -->
+  <view class="guide-overlay">
+    <view class="guide-corners">
+      <view class="gc tl" />
+      <view class="gc tr" />
+      <view class="gc bl" />
+      <view class="gc br" />
     </view>
-    <view class="viewfinder-mask bottom" />
   </view>
 
-  <view class="controls">
-    <view class="control-btn" bindtap="onAlbumImport">
-      <text class="control-icon">🖼</text>
+  <!-- 底部控制栏 -->
+  <view class="bottom-controls">
+    <view class="btn-side" bindtap="onAlbumImport">
+      <text>相册</text>
     </view>
     <view class="shutter" bindtap="onTakePhoto">
       <view class="shutter-inner" />
     </view>
-    <view class="control-btn" bindtap="onClose">
-      <text class="control-icon">✕</text>
+    <view class="btn-side" bindtap="onClose">
+      <text>关闭</text>
     </view>
   </view>
 
-  <view wx:if="{{multiPageMode}}" class="page-count">
+  <!-- 多页计数 -->
+  <view wx:if="{{multiPageMode}}" class="page-badge">
     <text>已拍 {{pages.length || 1}} 页</text>
   </view>
 </view>
