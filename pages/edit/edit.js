@@ -110,7 +110,11 @@ Page({
   },
 
   onSave() {
-    const itemList = ['保存图片到相册', '导出为PDF'];
+    const isMulti = this.data.pages.length > 1;
+    const itemList = ['保存当前页到相册'];
+    if (isMulti) {
+      itemList.push('保存全部页到相册');
+    }
     if (!this.data.isHistory) {
       itemList.push('继续扫描');
     }
@@ -119,8 +123,8 @@ Page({
       itemList,
       success: (res) => {
         if (res.tapIndex === 0) this.saveToAlbum();
-        else if (res.tapIndex === 1) this.exportPDF();
-        else if (res.tapIndex === 2) this.onContinueScan();
+        else if (res.tapIndex === 1 && isMulti) this.saveAllPagesToAlbum();
+        else if ((res.tapIndex === 1 && !isMulti) || res.tapIndex === 2) this.onContinueScan();
       }
     });
   },
@@ -155,24 +159,23 @@ Page({
     return saveRecord({ pages });
   },
 
-  async exportPDF() {
-    wx.showLoading({ title: '生成PDF...' });
-    try {
-      const { generatePDFFile } = require('../../utils/pdf-gen');
-      const paths = this.data.pages.map(p => p.tempPath || p.localImagePath);
-      const pdfPath = await generatePDFFile(paths);
-      wx.hideLoading();
-      this.saveToHistory();
-      wx.openDocument({
-        filePath: pdfPath,
-        showMenu: true,
-        success: () => wx.showToast({ title: 'PDF 已生成', icon: 'success' }),
-        fail: () => wx.showToast({ title: 'PDF 已保存', icon: 'success' })
-      });
-    } catch (err) {
-      wx.hideLoading();
-      wx.showToast({ title: 'PDF 生成失败', icon: 'none' });
-    }
+  saveAllPagesToAlbum() {
+    wx.authorize({
+      scope: 'scope.writePhotosAlbum',
+      success: () => {
+        const { saveAllToAlbum } = require('../../utils/pdf-gen');
+        const paths = this.data.pages.map(p => p.tempPath || p.localImagePath);
+        saveAllToAlbum(paths).then(() => {
+          this.saveToHistory();
+          wx.showToast({ title: `已保存${paths.length}页到相册`, icon: 'success' });
+        }).catch(() => {
+          wx.showToast({ title: '部分页面保存失败', icon: 'none' });
+        });
+      },
+      fail: () => {
+        wx.showToast({ title: '请在设置中开启相册权限', icon: 'none' });
+      }
+    });
   },
 
   onDeleteFromStrip(e) {
