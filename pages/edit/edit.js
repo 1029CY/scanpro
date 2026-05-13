@@ -179,19 +179,18 @@ Page({
 
   // Canvas 压缩图片，返回小尺寸的 temp path
   compressImage(imagePath, maxDim) {
-    const that = this;
     return new Promise((resolve, reject) => {
       const dim = maxDim || 1240;
-      const img = that.canvas.createImage();
+      const canvas = wx.createOffscreenCanvas({ type: '2d' });
+      const ctx = canvas.getContext('2d');
+      const img = canvas.createImage();
       img.onload = () => {
         const scale = Math.min(dim / img.width, dim / img.height, 1);
-        const w = Math.round(img.width * scale);
-        const h = Math.round(img.height * scale);
-        that.canvas.width = w;
-        that.canvas.height = h;
-        that.canvasCtx.drawImage(img, 0, 0, w, h);
+        canvas.width = Math.round(img.width * scale);
+        canvas.height = Math.round(img.height * scale);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
         wx.canvasToTempFilePath({
-          canvas: that.canvas,
+          canvas,
           fileType: 'jpg',
           quality: 0.7,
           success: (res) => resolve(res.tempFilePath),
