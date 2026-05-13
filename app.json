@@ -15,8 +15,5 @@
       "desc": "用于保存扫描件到系统相册"
     }
   },
-  "requiredPrivateInfos": [
-    "chooseMedia"
-  ],
   "sitemapLocation": "sitemap.json"
 }
