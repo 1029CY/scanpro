@@ -1,3 +1,11 @@
+.hidden-canvas {
+  position: fixed;
+  top: -9999rpx;
+  left: -9999rpx;
+  width: 1rpx;
+  height: 1rpx;
+}
+
 .page {
   display: flex;
   flex-direction: column;

@@ -1,6 +1,5 @@
 Page({
   data: {
-    multiPageMode: false,
     pageCount: 0
   },
 
@@ -8,10 +7,7 @@ Page({
     const app = getApp();
     const scan = app.globalData.currentScan;
     if (scan && scan.pages && scan.pages.length > 0) {
-      this.setData({
-        multiPageMode: true,
-        pageCount: scan.pages.length
-      });
+      this.setData({ pageCount: scan.pages.length });
     }
   },
 
@@ -22,10 +18,10 @@ Page({
       success: (res) => {
         this.addPage(res.tempImagePath);
       },
-      fail: (err) => {
+      fail: () => {
         wx.showModal({
           title: '拍照失败',
-          content: '模拟器不支持摄像头，请使用手机预览，或点击左下角「相册」从相册导入图片测试。',
+          content: 'PC模拟器不支持摄像头，请使用手机预览，或点击「相册」导入图片测试。',
           showCancel: false
         });
       }
@@ -53,25 +49,7 @@ Page({
     });
     app.globalData.currentScan = scan;
 
-    this.setData({ pageCount: scan.pages.length });
-
-    wx.showActionSheet({
-      itemList: ['继续扫描', '完成'],
-      success: (res) => {
-        if (res.tapIndex === 0) {
-          app.globalData.currentScan.multiPageMode = true;
-          this.setData({ multiPageMode: true });
-        } else {
-          this.goToEdit();
-        }
-      },
-      fail: () => {
-        this.goToEdit();
-      }
-    });
-  },
-
-  goToEdit() {
+    // 直接进入编辑页，不弹选择框
     wx.navigateTo({ url: '/pages/edit/edit' });
   },
 

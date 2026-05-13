@@ -1,4 +1,5 @@
 const { saveRecord, saveImageFile, getRecords } = require('../../utils/storage');
+const { generatePDF } = require('../../utils/pdf-gen');
 
 Page({
   data: {
@@ -9,15 +10,29 @@ Page({
     showCrop: false,
     isMultiPage: false,
     isHistory: false,
-    recordId: null
+    recordId: null,
+    canvasReady: false
   },
 
   onLoad(options) {
+    this.initCanvas();
     if (options.recordId) {
       this.loadHistoryRecord(options.recordId);
     } else {
       this.loadCurrentScan();
     }
+  },
+
+  initCanvas() {
+    const that = this;
+    const query = wx.createSelectorQuery();
+    query.select('.hidden-canvas').fields({ node: true, size: true }).exec((res) => {
+      if (res[0] && res[0].node) {
+        that.canvas = res[0].node;
+        that.canvasCtx = that.canvas.getContext('2d');
+        that.setData({ canvasReady: true });
+      }
+    });
   },
 
   loadHistoryRecord(recordId) {
@@ -65,7 +80,6 @@ Page({
 
   onSelectFilter(e) {
     const { type } = e.detail || e.currentTarget.dataset;
-    // 仅更新 UI 状态，实际滤镜处理延后到导出时
     this.setData({ filterType: type });
     const pages = this.data.pages;
     pages[this.data.currentIndex].filterType = type;
@@ -110,21 +124,17 @@ Page({
   },
 
   onSave() {
-    const isMulti = this.data.pages.length > 1;
-    const itemList = ['保存当前页到相册'];
-    if (isMulti) {
+    const itemList = ['保存当前页到相册', '导出为 PDF'];
+    if (this.data.pages.length > 1) {
       itemList.push('保存全部页到相册');
-    }
-    if (!this.data.isHistory) {
-      itemList.push('继续扫描');
     }
 
     wx.showActionSheet({
       itemList,
       success: (res) => {
         if (res.tapIndex === 0) this.saveToAlbum();
-        else if (res.tapIndex === 1 && isMulti) this.saveAllPagesToAlbum();
-        else if ((res.tapIndex === 1 && !isMulti) || res.tapIndex === 2) this.onContinueScan();
+        else if (res.tapIndex === 1) this.exportPDF();
+        else if (res.tapIndex === 2) this.saveAllPagesToAlbum();
       }
     });
   },
@@ -133,9 +143,8 @@ Page({
     wx.authorize({
       scope: 'scope.writePhotosAlbum',
       success: () => {
-        const path = this.data.currentImage;
         wx.saveImageToPhotosAlbum({
-          filePath: path,
+          filePath: this.data.currentImage,
           success: () => {
             this.saveToHistory();
             wx.showToast({ title: '已保存到相册', icon: 'success' });
@@ -149,6 +158,84 @@ Page({
     });
   },
 
+  saveAllPagesToAlbum() {
+    wx.authorize({
+      scope: 'scope.writePhotosAlbum',
+      success: () => {
+        const paths = this.data.pages.map(p => p.tempPath || p.localImagePath);
+        const { saveAllToAlbum } = require('../../utils/pdf-gen');
+        saveAllToAlbum(paths).then(() => {
+          this.saveToHistory();
+          wx.showToast({ title: '已保存全部到相册', icon: 'success' });
+        }).catch(() => {
+          wx.showToast({ title: '部分保存失败', icon: 'none' });
+        });
+      },
+      fail: () => {
+        wx.showToast({ title: '请在设置中开启相册权限', icon: 'none' });
+      }
+    });
+  },
+
+  // Canvas 压缩图片，返回小尺寸的 temp path
+  compressImage(imagePath, maxDim) {
+    const that = this;
+    return new Promise((resolve, reject) => {
+      const dim = maxDim || 1240;
+      const img = that.canvas.createImage();
+      img.onload = () => {
+        const scale = Math.min(dim / img.width, dim / img.height, 1);
+        const w = Math.round(img.width * scale);
+        const h = Math.round(img.height * scale);
+        that.canvas.width = w;
+        that.canvas.height = h;
+        that.canvasCtx.drawImage(img, 0, 0, w, h);
+        wx.canvasToTempFilePath({
+          canvas: that.canvas,
+          fileType: 'jpg',
+          quality: 0.7,
+          success: (res) => resolve(res.tempFilePath),
+          fail: reject
+        });
+      };
+      img.onerror = reject;
+      img.src = imagePath;
+    });
+  },
+
+  async exportPDF() {
+    wx.showLoading({ title: '生成 PDF...' });
+    try {
+      const paths = this.data.pages.map(p => p.tempPath || p.localImagePath);
+
+      // Canvas 压缩每张图片到 1240px，避免内存溢出
+      const compressed = [];
+      for (const p of paths) {
+        const small = await this.compressImage(p, 1240);
+        compressed.push(small);
+      }
+
+      const pdfPath = await generatePDF(compressed);
+      wx.hideLoading();
+
+      if (pdfPath) {
+        this.saveToHistory();
+        wx.openDocument({
+          filePath: pdfPath,
+          showMenu: true,
+          success: () => wx.showToast({ title: 'PDF 已生成', icon: 'success' }),
+          fail: () => wx.showToast({ title: '请从相册查看', icon: 'none' })
+        });
+      } else {
+        wx.showToast({ title: 'PDF 生成失败', icon: 'none' });
+      }
+    } catch (err) {
+      wx.hideLoading();
+      console.error('PDF export error:', err);
+      wx.showToast({ title: 'PDF 生成失败，请保存到相册', icon: 'none' });
+    }
+  },
+
   saveToHistory() {
     const pages = this.data.pages.map(p => ({
       pageId: 'p' + Date.now() + Math.random().toString(36).slice(2),
@@ -157,25 +244,6 @@ Page({
       cropPoints: p.cropPoints || null
     }));
     return saveRecord({ pages });
-  },
-
-  saveAllPagesToAlbum() {
-    wx.authorize({
-      scope: 'scope.writePhotosAlbum',
-      success: () => {
-        const { saveAllToAlbum } = require('../../utils/pdf-gen');
-        const paths = this.data.pages.map(p => p.tempPath || p.localImagePath);
-        saveAllToAlbum(paths).then(() => {
-          this.saveToHistory();
-          wx.showToast({ title: `已保存${paths.length}页到相册`, icon: 'success' });
-        }).catch(() => {
-          wx.showToast({ title: '部分页面保存失败', icon: 'none' });
-        });
-      },
-      fail: () => {
-        wx.showToast({ title: '请在设置中开启相册权限', icon: 'none' });
-      }
-    });
   },
 
   onDeleteFromStrip(e) {
