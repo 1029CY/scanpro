@@ -1,4 +1,3 @@
-const { processImage } = require('../../utils/pipeline');
 const { saveRecord, saveImageFile, getRecords } = require('../../utils/storage');
 
 Page({
@@ -64,25 +63,13 @@ Page({
     });
   },
 
-  async onSelectFilter(e) {
+  onSelectFilter(e) {
     const { type } = e.detail || e.currentTarget.dataset;
-    const imagePath = this.data.currentImage;
+    // 仅更新 UI 状态，实际滤镜处理延后到导出时
     this.setData({ filterType: type });
-
-    try {
-      const result = await processImage(imagePath, {
-        filterType: type,
-        cropPoints: this.data.pages[this.data.currentIndex].cropPoints
-      });
-
-      const pages = this.data.pages;
-      pages[this.data.currentIndex].tempPath = result.processedPath;
-      pages[this.data.currentIndex].filterType = type;
-      this.setData({ pages, currentImage: result.processedPath });
-    } catch (err) {
-      // 滤镜切换失败，保持原图
-      wx.showToast({ title: '处理失败', icon: 'none' });
-    }
+    const pages = this.data.pages;
+    pages[this.data.currentIndex].filterType = type;
+    this.setData({ pages });
   },
 
   onToggleCrop() {
@@ -142,12 +129,10 @@ Page({
     wx.authorize({
       scope: 'scope.writePhotosAlbum',
       success: () => {
-        // 保存当前页到相册
         const path = this.data.currentImage;
         wx.saveImageToPhotosAlbum({
           filePath: path,
           success: () => {
-            // 保存记录到历史
             this.saveToHistory();
             wx.showToast({ title: '已保存到相册', icon: 'success' });
           },
@@ -161,38 +146,28 @@ Page({
   },
 
   saveToHistory() {
-    // 将临时图片转为持久化文件
     const pages = this.data.pages.map(p => ({
       pageId: 'p' + Date.now() + Math.random().toString(36).slice(2),
       localImagePath: saveImageFile(p.tempPath),
       filterType: p.filterType || 'enhanced',
       cropPoints: p.cropPoints || null
     }));
-
     return saveRecord({ pages });
   },
 
   async exportPDF() {
     wx.showLoading({ title: '生成PDF...' });
-
     try {
       const { generatePDFFile } = require('../../utils/pdf-gen');
       const paths = this.data.pages.map(p => p.tempPath || p.localImagePath);
       const pdfPath = await generatePDFFile(paths);
-
       wx.hideLoading();
-      // 保存记录
       this.saveToHistory();
-      // 打开预览
       wx.openDocument({
         filePath: pdfPath,
         showMenu: true,
-        success: () => {
-          wx.showToast({ title: 'PDF 已生成', icon: 'success' });
-        },
-        fail: () => {
-          wx.showToast({ title: 'PDF 已保存', icon: 'success' });
-        }
+        success: () => wx.showToast({ title: 'PDF 已生成', icon: 'success' }),
+        fail: () => wx.showToast({ title: 'PDF 已保存', icon: 'success' })
       });
     } catch (err) {
       wx.hideLoading();
@@ -200,7 +175,6 @@ Page({
     }
   },
 
-  // 删除页面（来自 thumbnail-strip 组件）
   onDeleteFromStrip(e) {
     const { index } = e.detail;
     const pages = this.data.pages;

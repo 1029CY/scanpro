@@ -22,8 +22,12 @@ Page({
       success: (res) => {
         this.addPage(res.tempImagePath);
       },
-      fail: () => {
-        wx.showToast({ title: '拍照失败，请重试', icon: 'none' });
+      fail: (err) => {
+        wx.showModal({
+          title: '拍照失败',
+          content: '模拟器不支持摄像头，请使用手机预览，或点击左下角「相册」从相册导入图片测试。',
+          showCancel: false
+        });
       }
     });
   },
