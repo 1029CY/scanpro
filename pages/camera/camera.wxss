@@ -1,0 +1,120 @@
+.page {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  background: #000;
+}
+
+.camera {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.viewfinder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.viewfinder-mask {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.viewfinder-mask.top, .viewfinder-mask.bottom {
+  width: 100%;
+  height: 120rpx;
+}
+
+.viewfinder-middle {
+  display: flex;
+  flex: 1;
+}
+
+.viewfinder-mask.left, .viewfinder-mask.right {
+  flex: 1;
+}
+
+.viewfinder-frame {
+  width: 560rpx;
+  height: 420rpx;
+  border: 2rpx solid rgba(255, 255, 255, 0.5);
+  position: relative;
+}
+
+.corner {
+  position: absolute;
+  width: 40rpx;
+  height: 40rpx;
+}
+
+.tl { top: -2rpx; left: -2rpx; border-top: 6rpx solid #fff; border-left: 6rpx solid #fff; }
+.tr { top: -2rpx; right: -2rpx; border-top: 6rpx solid #fff; border-right: 6rpx solid #fff; }
+.bl { bottom: -2rpx; left: -2rpx; border-bottom: 6rpx solid #fff; border-left: 6rpx solid #fff; }
+.br { bottom: -2rpx; right: -2rpx; border-bottom: 6rpx solid #fff; border-right: 6rpx solid #fff; }
+
+.controls {
+  position: absolute;
+  bottom: 80rpx;
+  left: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  z-index: 20;
+  padding: 0 80rpx;
+  box-sizing: border-box;
+}
+
+.control-btn {
+  width: 88rpx;
+  height: 88rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.control-icon {
+  font-size: 48rpx;
+  color: #fff;
+}
+
+.shutter {
+  width: 128rpx;
+  height: 128rpx;
+  border-radius: 64rpx;
+  border: 6rpx solid #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.shutter-inner {
+  width: 104rpx;
+  height: 104rpx;
+  border-radius: 52rpx;
+  background: #fff;
+}
+
+.page-count {
+  position: absolute;
+  top: 100rpx;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  z-index: 20;
+}
+
+.page-count text {
+  color: #fff;
+  font-size: 28rpx;
+  background: rgba(0,0,0,0.4);
+  padding: 8rpx 24rpx;
+  border-radius: 16rpx;
+}

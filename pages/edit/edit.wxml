@@ -1,0 +1,36 @@
+<view class="page">
+  <view class="preview-area">
+    <crop-view wx:if="{{showCrop}}"
+               src="{{currentImage}}"
+               src="{{currentImage}}"
+               bind:change="onCropChange" />
+    <image wx:else class="preview-image"
+           src="{{currentImage}}"
+           mode="widthFix" />
+  </view>
+
+  <filter-picker current="{{filterType}}" bind:select="onSelectFilter" />
+
+  <view class="toolbar">
+    <view class="tool-btn {{showCrop ? 'active' : ''}}" bindtap="onToggleCrop">
+      <text>✂ 裁剪</text>
+    </view>
+    <view class="tool-btn" bindtap="onDeletePage">
+      <text>🗑 删除</text>
+    </view>
+  </view>
+
+  <thumbnail-strip wx:if="{{isMultiPage}}"
+                   pages="{{pages}}"
+                   current="{{currentIndex}}"
+                   bind:switch="onSwitchPage" />
+
+  <view class="bottom-bar">
+    <view wx:if="{{isMultiPage}}" class="btn-add" bindtap="onContinueScan">
+      <text>+ 添加页</text>
+    </view>
+    <view class="btn-save" bindtap="onSave">
+      <text>完成 / 保存</text>
+    </view>
+  </view>
+</view>

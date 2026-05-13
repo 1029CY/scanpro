@@ -1,0 +1,78 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: #1a1a1a;
+}
+
+.preview-area {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.preview-image {
+  width: 100%;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: center;
+  padding: 24rpx;
+  gap: 48rpx;
+}
+
+.tool-btn {
+  padding: 16rpx 32rpx;
+  border-radius: 32rpx;
+  background: rgba(255,255,255,0.1);
+}
+
+.tool-btn text {
+  font-size: 26rpx;
+  color: #ccc;
+}
+
+.tool-btn.active {
+  background: var(--primary);
+}
+
+.tool-btn.active text {
+  color: #fff;
+}
+
+.bottom-bar {
+  display: flex;
+  padding: 24rpx;
+  background: #222;
+  gap: 24rpx;
+}
+
+.btn-add {
+  flex: 1;
+  text-align: center;
+  padding: 24rpx;
+  border-radius: 16rpx;
+  border: 2rpx solid var(--primary);
+}
+
+.btn-add text {
+  color: var(--primary);
+  font-size: 30rpx;
+}
+
+.btn-save {
+  flex: 1;
+  text-align: center;
+  padding: 24rpx;
+  border-radius: 16rpx;
+  background: var(--primary);
+}
+
+.btn-save text {
+  color: #fff;
+  font-size: 30rpx;
+  font-weight: 500;
+}

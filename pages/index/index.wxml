@@ -1,0 +1,27 @@
+<view class="page">
+  <view wx:if="{{isEmpty}}" class="empty-state">
+    <view class="empty-icon">📄</view>
+    <text class="empty-text">点击下方按钮，扫描第一份文件</text>
+  </view>
+
+  <scroll-view wx:else class="list" scroll-y>
+    <view wx:for="{{records}}" wx:key="id" class="record-item"
+          bindtap="onTapRecord" data-id="{{item.id}}">
+      <image class="record-thumb" src="{{item.pages[0].localImagePath}}" mode="aspectFill" />
+      <view class="record-info">
+        <text class="record-title">{{item.title || '扫描件_' + item.createTime}}</text>
+        <text class="record-pages">{{item.pageCount}}页</text>
+      </view>
+      <view class="record-delete" catchtap="onDeleteRecord" data-id="{{item.id}}">
+        <text>删除</text>
+      </view>
+    </view>
+  </scroll-view>
+
+  <view class="bottom-bar">
+    <view class="scan-btn" bindtap="onStartScan">
+      <text class="scan-btn-icon">+</text>
+      <text class="scan-btn-text">开始扫描</text>
+    </view>
+  </view>
+</view>

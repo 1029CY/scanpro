@@ -1,0 +1,34 @@
+<view class="page">
+  <camera class="camera" device-position="back" flash="auto" />
+
+  <view class="viewfinder">
+    <view class="viewfinder-mask top" />
+    <view class="viewfinder-middle">
+      <view class="viewfinder-mask left" />
+      <view class="viewfinder-frame">
+        <view class="corner tl" />
+        <view class="corner tr" />
+        <view class="corner bl" />
+        <view class="corner br" />
+      </view>
+      <view class="viewfinder-mask right" />
+    </view>
+    <view class="viewfinder-mask bottom" />
+  </view>
+
+  <view class="controls">
+    <view class="control-btn" bindtap="onAlbumImport">
+      <text class="control-icon">🖼</text>
+    </view>
+    <view class="shutter" bindtap="onTakePhoto">
+      <view class="shutter-inner" />
+    </view>
+    <view class="control-btn" bindtap="onClose">
+      <text class="control-icon">✕</text>
+    </view>
+  </view>
+
+  <view wx:if="{{multiPageMode}}" class="page-count">
+    <text>已拍 {{pages.length || 1}} 页</text>
+  </view>
+</view>

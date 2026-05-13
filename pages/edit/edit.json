@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "编辑扫描件",
+  "usingComponents": {
+    "crop-view": "/components/crop-view/crop-view",
+    "filter-picker": "/components/filter-picker/filter-picker",
+    "thumbnail-strip": "/components/thumbnail-strip/thumbnail-strip"
+  }
+}
