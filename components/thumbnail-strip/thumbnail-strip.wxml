@@ -1,0 +1,13 @@
+<view class="thumbnail-strip">
+  <scroll-view class="strip-list" scroll-x>
+    <view wx:for="{{pages}}" wx:key="pageId" wx:for-index="idx"
+          class="thumb-item {{current === idx ? 'active' : ''}}"
+          bindtap="onTap" data-index="{{idx}}"
+          bindlongpress="onLongPress" data-index="{{idx}}">
+      <image class="thumb-img" src="{{item.tempPath || item.localImagePath}}" mode="aspectFill" />
+      <view class="thumb-label">
+        <text>{{idx + 1}}</text>
+      </view>
+    </view>
+  </scroll-view>
+</view>

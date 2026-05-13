@@ -1,0 +1,31 @@
+.filter-picker {
+  padding: 16rpx 0;
+  background: #222;
+}
+
+.filter-list {
+  display: flex;
+  white-space: nowrap;
+  padding: 0 24rpx;
+}
+
+.filter-item {
+  display: inline-flex;
+  padding: 16rpx 32rpx;
+  margin-right: 16rpx;
+  border-radius: 32rpx;
+  background: rgba(255,255,255,0.08);
+}
+
+.filter-item text {
+  font-size: 26rpx;
+  color: #999;
+}
+
+.filter-item.active {
+  background: var(--primary);
+}
+
+.filter-item.active text {
+  color: #fff;
+}

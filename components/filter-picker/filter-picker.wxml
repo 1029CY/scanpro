@@ -1,0 +1,9 @@
+<view class="filter-picker">
+  <scroll-view class="filter-list" scroll-x>
+    <view wx:for="{{filters}}" wx:key="type"
+          class="filter-item {{current === item.type ? 'active' : ''}}"
+          bindtap="onSelect" data-type="{{item.type}}">
+      <text>{{item.label}}</text>
+    </view>
+  </scroll-view>
+</view>

@@ -1,0 +1,7 @@
+<view class="crop-view">
+  <canvas class="crop-canvas" type="2d"
+          bindtouchstart="onTouchStart"
+          bindtouchmove="onTouchMove"
+          bindtouchend="onTouchEnd" />
+  <image class="preview-img" src="{{src}}" mode="aspectFit" />
+</view>

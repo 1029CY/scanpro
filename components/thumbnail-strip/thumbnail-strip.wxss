@@ -1,0 +1,41 @@
+.thumbnail-strip {
+  padding: 16rpx 24rpx;
+  background: #1a1a1a;
+}
+
+.strip-list {
+  display: flex;
+  white-space: nowrap;
+}
+
+.thumb-item {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  margin-right: 12rpx;
+  position: relative;
+}
+
+.thumb-img {
+  width: 88rpx;
+  height: 118rpx;
+  border-radius: 8rpx;
+  border: 2rpx solid transparent;
+}
+
+.thumb-item.active .thumb-img {
+  border-color: var(--primary);
+}
+
+.thumb-label {
+  margin-top: 4rpx;
+}
+
+.thumb-label text {
+  font-size: 22rpx;
+  color: #999;
+}
+
+.thumb-item.active .thumb-label text {
+  color: var(--primary);
+}
